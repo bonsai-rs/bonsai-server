@@ -5,12 +5,13 @@ use std::{sync::Mutex, time::Instant};
 
 use rocket::State;
 
+#[derive(Clone, Copy)]
 struct Session {
     token: u16,
 }
 
 struct TakenTokens {
-    token_list: Mutex<Vec<u16>>,
+    token_list: Mutex<Vec<Session>>,
 }
 
 impl Session {
@@ -32,13 +33,32 @@ fn rocket() -> _ {
         .mount("/session", routes![create_session])
 }
 
+#[post("/start")]
+fn start_session(token: u16) -> Instant {
+   folet PartialOr
+}
+
+fn is_token_taken(token: u16, taken_tokens:&State<TakenTokens>) -> bool {
+    for item in &*taken_tokens.token_list.lock().unwrap() {
+        if token == item.get_token() {
+            return true;
+        }
+    }
+    false
+}
+
 #[get("/create")]
 fn create_session(taken_tokens: &State<TakenTokens>) -> String {
-    let session = Session::new(rand::random_range(1000..=9999));
+    let mut session;
+    loop {
+        session = Session::new(rand::random_range(1000..=9999));
+    if !is_token_taken(session.get_token(), taken_tokens) {
+        break;
+    }}
     taken_tokens
         .token_list
         .lock()
         .unwrap()
-        .push(session.get_token());
+        .push(session.clone());
     session.token.to_string()
 }
