@@ -92,12 +92,17 @@ fn rocket() -> _ {
         .manage(TakenTokens {
             token_list: Mutex::new(Vec::new()),
         })
-        .mount("/session", routes![create_session])
-        .mount("/session", routes![start_session])
-        .mount("/session", routes![join_session])
-        .mount("/session", routes![terminate_session])
-        .mount("/session", routes![terminate_notify])
-        .mount("/session", routes![get_users_list])
+        .mount(
+            "/session",
+            routes![
+                create_session,
+                start_session,
+                join_session,
+                terminate_session,
+                terminate_notify,
+                get_users_list
+            ],
+        )
 }
 
 fn is_token_taken(token: u16, taken_tokens: &State<TakenTokens>) -> bool {
